@@ -25,7 +25,6 @@ const init = async (opts = {}) => {
     name: 'anonymous',
     key: 'secret',
     port: 26017,
-    behindProxy: false,
   };
 
   global.options = { ...defaults, ...opts };
