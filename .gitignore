@@ -1,0 +1,7 @@
+/node_modules
+/config.json
+/yarn.lock
+/.idea
+.env
+test1.js
+test2.js
