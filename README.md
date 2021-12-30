@@ -75,7 +75,7 @@ try {
   return console.log('could not get file');
 }
 
-console.log('get', result);
+console.log('get', result); // result.url is the tokenized url for the file, valid for 24 hours
 ```
 
 Remove a file from the vault (client must be connected first):
