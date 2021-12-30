@@ -1,6 +1,6 @@
 {
   "name": "covetfs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CovetFS is a distributed file system for Node.js. It comes with a JWT-protected API, with 24-hours tokens for file access.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Honeyside/honeyside-cli.git"
+    "url": "git+https://github.com/Honeyside/CovetFS.git"
   },
   "keywords": [
     "honeyside",
