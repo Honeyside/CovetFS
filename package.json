@@ -1,7 +1,7 @@
 {
-  "name": "honeyside-cli",
+  "name": "covetfs",
   "version": "1.0.0",
-  "description": "The official Honeyside CLI.",
+  "description": "CovetFS is a distributed file system for Node.js. It comes with a JWT-protected API, with 24-hours tokens for file access.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,13 +12,12 @@
   },
   "keywords": [
     "honeyside",
-    "cli",
-    "package",
-    "manager",
-    "purchase",
-    "code",
-    "sale",
-    "verify"
+    "covet",
+    "covetfs",
+    "distributed",
+    "file",
+    "system",
+    "file system"
   ],
   "author": "Honeyside",
   "license": "MIT",

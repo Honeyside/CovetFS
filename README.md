@@ -3,7 +3,7 @@
 [npm-image]: https://img.shields.io/npm/v/covetfs.svg
 [npm-url]: https://www.npmjs.com/package/covetfs
 
-CovetFS is a distributed file system. It comes with a JWT-protected API, with 24-hours tokens for file access.
+CovetFS is a distributed file system for Node.js. It comes with a JWT-protected API, with 24-hours tokens for file access.
 
 Support us on <a href="https://www.patreon.com/honeyside"><strong>Patreon</strong></a> to get priority updates on our development plan and <strong>voting power on new features</strong>.
 
