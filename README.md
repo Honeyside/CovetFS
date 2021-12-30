@@ -29,9 +29,8 @@ const covet = require('covetfs');
 covet.init({
   name: 'my-server', // whatever you like
   key: 'secret', // very long random secret key that only you will know
-  hostname: 'localhost', // will be used to build your url
-  port: 26017, // will be used to build your url
-  ssl: false, // will be used to build your url
+  port: 26017, // server will listen on this port
+  url: 'http://yourdomain.tld:26017', // will be used to build your url, you can use a reverse proxy here
 })
 ```
 

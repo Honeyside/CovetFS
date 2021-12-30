@@ -28,7 +28,7 @@ router.post('/sign', (req, res) => {
     } else {
       res.status(200).json({
         token,
-        url: `${global.options.ssl ? 'https' : 'http'}://${global.options.hostname}:${global.options.port}/${result.id}.${result.ext}?token=${token}`,
+        url: `${global.options.url}/${result.id}.${result.ext}?token=${token}`,
         id,
       });
     }

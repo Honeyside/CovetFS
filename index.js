@@ -21,11 +21,11 @@ const log = (text) => {
 
 const init = async (opts = {}) => {
   const defaults = {
-    ssl: false,
+    url: 'http://localhost:26017',
     name: 'anonymous',
-    hostname: 'localhost',
     key: 'secret',
     port: 26017,
+    behindProxy: false,
   };
 
   global.options = { ...defaults, ...opts };
