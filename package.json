@@ -1,6 +1,6 @@
 {
   "name": "covetfs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CovetFS is a distributed file system for Node.js. It comes with a JWT-protected API, with 24-hours tokens for file access.",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.24.0",
-    "colors": "^1.4.0",
+    "colors": "1.4.0",
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "express-formidable": "^1.2.0",
