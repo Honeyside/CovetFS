@@ -1,9 +1,10 @@
 require('colors');
+const store = require('./src/store');
 
 const homedir = require('os').homedir();
 const dataFolder = `${homedir}/data/covet`;
-global.options = {};
-global.instanceFolder = dataFolder;
+store.get().options = {};
+store.get().instanceFolder = dataFolder;
 
 const mkdirp = require('mkdirp');
 const express = require('express');
@@ -16,7 +17,7 @@ const passport = require("passport");
 const {Strategy, ExtractJwt} = require("passport-jwt");
 
 const log = (text) => {
-  console.log(`covet [${global.options.name}]: ${text}`);
+  console.log(`covet [${store.get().options.name}]: ${text}`);
 }
 
 const init = async (opts = {}) => {
@@ -27,41 +28,41 @@ const init = async (opts = {}) => {
     port: 26017,
   };
 
-  global.options = { ...defaults, ...opts };
+  store.get().options = { ...defaults, ...opts };
 
   // create data folder
-  global.instanceFolder = `${dataFolder}/${global.options.name}`;
-  mkdirp.sync(instanceFolder);
-  log(`instance folder is ${global.instanceFolder.cyan}`);
+  store.get().instanceFolder = `${dataFolder}/${store.get().options.name}`;
+  mkdirp.sync(store.get().instanceFolder);
+  log(`instance folder is ${store.get().instanceFolder.cyan}`);
   const loadHandler = () => {
-    global.vault = global.db.getCollection('vault');
-    if (!global.vault) {
-      global.vault = global.db.addCollection('vault');
+    store.get().vault = store.get().db.getCollection('vault');
+    if (!store.get().vault) {
+      store.get().vault = store.get().db.addCollection('vault');
     } else {
       log('loaded vault from disk');
     }
-    global.store = global.db.getCollection('store');
-    if (!global.store) {
-      global.store = global.db.addCollection('store');
+    store.get().store = store.get().db.getCollection('store');
+    if (!store.get().store) {
+      store.get().store = store.get().db.addCollection('store');
     } else {
       log('loaded store from disk');
     }
   };
-  global.db = new loki(`${global.instanceFolder}/loki.db`, {
+  store.get().db = new loki(`${store.get().instanceFolder}/loki.db`, {
     autoload: true,
     autosave: true,
     autoloadCallback: loadHandler,
   });
-  global.vault = global.db.addCollection('vault');
-  global.store = global.db.addCollection('store');
+  store.get().vault = store.get().db.addCollection('vault');
+  store.get().store = store.get().db.addCollection('store');
 
   // generate access key
-  jwt.sign({ application: 'covet', master: true }, global.global.options.key, { expiresIn: Number.MAX_SAFE_INTEGER }, async (err, token) => {
+  jwt.sign({ application: 'covet', master: true }, store.get().options.key, { expiresIn: Number.MAX_SAFE_INTEGER }, async (err, token) => {
     if (err) {
       console.log(err);
     } else {
       log(`access key ${token.cyan}`);
-      global.token = token;
+      store.get().token = token;
     }
   });
 
@@ -75,7 +76,7 @@ const init = async (opts = {}) => {
   app.use(passport.initialize({}));
   passport.use('jwt', new Strategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: global.options.key
+    secretOrKey: store.get().options.key
   }, (payload, done) => {
     if (payload.master) {
       done(null, payload);
@@ -89,8 +90,8 @@ const init = async (opts = {}) => {
   app.use(require('./src/authenticated-routes'));
 
   // listen on http server
-  httpServer.listen(global.options.port, () => {
-    log(`listening on port ${global.options.port}`.green);
+  httpServer.listen(store.get().options.port, () => {
+    log(`listening on port ${store.get().options.port}`.green);
   });
 };
 

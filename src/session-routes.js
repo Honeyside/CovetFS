@@ -1,3 +1,4 @@
+const store = require('./store');
 const express = require('express');
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -8,7 +9,7 @@ router.use('/info', (req, res) => {
   res.status(200).json({
     app: 'covet',
     ...version,
-    name: global.options.name,
+    name: store.get().options.name,
   });
 });
 
@@ -18,14 +19,14 @@ router.get('/:id/info', (req, res) => {
   if (!token) {
     return res.status(400).json({ code: 'token-required' });
   }
-  jwt.verify(token, global.options.key, { maxAge: 3600 * 24 }, (err, decoded) => {
+  jwt.verify(token, store.get().options.key, { maxAge: 3600 * 24 }, (err, decoded) => {
     if (err || id !== decoded.id) {
       res.status(401).json({
         ...(err || {}),
         code: 'token-error',
       });
     } else {
-      const result = global.vault.findOne({ id });
+      const result = store.get().vault.findOne({ id });
       if (!result) {
         return res.status(404).json({ code: 'not found' });
       }
@@ -41,7 +42,7 @@ router.get('/:id', (req, res) => {
   if (!token) {
     return res.status(400).json({ code: 'token-required' });
   }
-  jwt.verify(token, global.options.key, { maxAge: 3600 * 24 }, (err, decoded) => {
+  jwt.verify(token, store.get().options.key, { maxAge: 3600 * 24 }, (err, decoded) => {
     if (err || id !== decoded.id) {
       res.status(401).json({
         ...(err || {}),
@@ -49,7 +50,7 @@ router.get('/:id', (req, res) => {
       });
     } else {
       const range = req.headers.range;
-      const result = global.vault.findOne({ id });
+      const result = store.get().vault.findOne({ id });
       if (!result) {
         return res.status(404).send('');
       }
@@ -64,10 +65,10 @@ router.get('/:id', (req, res) => {
         res.set('Content-Range', `bytes ${start}-${end}/${result.size}`);
         res.set('Accept-Ranges', 'bytes');
         res.set('Content-Length', chunksize);
-        readStream = fs.createReadStream(`${instanceFolder}/${result.dateString}/${id}`, {start, end});
+        readStream = fs.createReadStream(`${store.get().instanceFolder}/${result.dateString}/${id}`, {start, end});
       } else {
         res.set('Content-Length', result.size);
-        readStream = fs.createReadStream(`${instanceFolder}/${result.dateString}/${id}`);
+        readStream = fs.createReadStream(`${store.get().instanceFolder}/${result.dateString}/${id}`);
       }
       readStream.pipe(res);
       res.status(range ? 206 : 200);

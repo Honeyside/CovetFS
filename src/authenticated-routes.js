@@ -1,3 +1,4 @@
+const store = require('./store');
 const express = require('express');
 const jwt = require("jsonwebtoken");
 const md5File = require("md5-file");
@@ -10,17 +11,17 @@ router.post('/connect', (req, res) => {
   res.status(200).json({
     app: 'covet',
     ...version,
-    name: global.options.name,
+    name: store.get().options.name,
   });
 });
 
 router.post('/sign', (req, res) => {
   const id = parseInt(req.fields.id);
-  const result = global.vault.findOne({ id });
+  const result = store.get().vault.findOne({ id });
   if (!result) {
     return res.status(404).json({ code: 'not-found' });
   }
-  jwt.sign({ application: 'covet', id }, global.options.key, { expiresIn: 3600 * 24 }, async (err, token) => {
+  jwt.sign({ application: 'covet', id }, store.get().options.key, { expiresIn: 3600 * 24 }, async (err, token) => {
     if (err) {
       res.status(500).json({
         code: 'could-not-generate-token',
@@ -28,7 +29,7 @@ router.post('/sign', (req, res) => {
     } else {
       res.status(200).json({
         token,
-        url: `${global.options.url}/${result.id}.${result.ext}?token=${token}`,
+        url: `${store.get().options.url}/${result.id}${result.ext ? `.${result.ext}` : ''}?token=${token}`,
         id,
       });
     }
@@ -45,20 +46,20 @@ router.post('/add', async (req, res) => {
 
   let id = 0;
 
-  const idObject = global.store.findOne({ name: 'id' });
+  const idObject = store.get().store.findOne({ name: 'id' });
 
   if (!idObject) {
-    global.store.insert({ name: 'id', value: id });
+    store.get().store.insert({ name: 'id', value: id });
   } else {
     id = idObject.value + 1;
   }
 
-  global.store.findAndUpdate({ name: 'id' }, item => {
+  store.get().store.findAndUpdate({ name: 'id' }, item => {
     item.value = id;
   });
-  global.db.saveDatabase();
+  store.get().db.saveDatabase();
 
-  const result = global.vault.insert({
+  const result = store.get().vault.insert({
     name: file.name,
     ext: (file.name || '').split('.').pop(),
     size: file.size,
@@ -69,16 +70,16 @@ router.post('/add', async (req, res) => {
     descriptor: req.fields,
     id,
     source: {
-      name: global.options.name,
-      hostname: global.options.hostname,
-      port: global.options.port,
-      ssl: global.options.ssl,
+      name: store.get().options.name,
+      hostname: store.get().options.hostname,
+      port: store.get().options.port,
+      ssl: store.get().options.ssl,
     },
   });
-  global.db.saveDatabase();
+  store.get().db.saveDatabase();
 
   const readStream = fs.createReadStream(file.path);
-  const dateFolder = `${global.instanceFolder}/${dateString}`;
+  const dateFolder = `${store.get().instanceFolder}/${dateString}`;
   mkdirp.sync(dateFolder);
   const writeStream = fs.createWriteStream(`${dateFolder}/${result.id}`);
   readStream.pipe(writeStream);
@@ -93,8 +94,8 @@ router.post('/find', (req, res) => {
   if (req.fields.regex) {
     query.name = { $regex: req.fields.regex };
   }
-  const result = global.vault.chain().find(query).simplesort('id', ).offset(offset).limit(limit).data();
-  const count = global.vault.count();
+  const result = store.get().vault.chain().find(query).simplesort('id', ).offset(offset).limit(limit).data();
+  const count = store.get().vault.count();
   res.json({
     total: count,
     count: result.length,
@@ -105,17 +106,17 @@ router.post('/find', (req, res) => {
 
 router.post('/remove', (req, res) => {
   const id = parseInt(req.fields.id);
-  let result = global.vault.findOne({ id });
+  let result = store.get().vault.findOne({ id });
   if (!result) {
     return res.status(404).json({ code: 'not-found' });
   }
-  const path = `${global.instanceFolder}/${result.dateString}/${id}`;
+  const path = `${store.get().instanceFolder}/${result.dateString}/${id}`;
   try {
     fs.unlinkSync(path);
   } catch (e) {
     return res.status(404).json({ code: 'not-found' });
   }
-  global.vault.chain().find({ id }).remove();
+  store.get().vault.chain().find({ id }).remove();
   res.status(200).json(result);
 });
 
