@@ -18,7 +18,7 @@ const sign = async (id) => {
       } else {
         resolve({
           token,
-          url: `${store.get().options.url}/${result.id}${result.ext ? `.${result.ext}` : ''}?token=${token}`,
+          url: `${store.get().options.url}${store.get().options.prefix}/${result.id}${result.ext ? `.${result.ext}` : ''}?token=${token}`,
           id,
           status: 200,
         });
